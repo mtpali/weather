@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- soft sun halo -->
+    <path
+        android:fillColor="#33FFF0A6"
+        android:pathData="M34,13a21,21 0,1 0,0.01 0z" />
+
+    <!-- sun rays -->
+    <path android:strokeColor="#FFFFC247" android:strokeWidth="3.6" android:strokeLineCap="round" android:pathData="M34,6L34,12" />
+    <path android:strokeColor="#FFFFC247" android:strokeWidth="3.6" android:strokeLineCap="round" android:pathData="M34,48L34,54" />
+    <path android:strokeColor="#FFFFC247" android:strokeWidth="3.6" android:strokeLineCap="round" android:pathData="M6,30L12,30" />
+    <path android:strokeColor="#FFFFC247" android:strokeWidth="3.6" android:strokeLineCap="round" android:pathData="M56,30L62,30" />
+    <path android:strokeColor="#FFFFC247" android:strokeWidth="3.6" android:strokeLineCap="round" android:pathData="M14,10L18.5,14.5" />
+    <path android:strokeColor="#FFFFC247" android:strokeWidth="3.6" android:strokeLineCap="round" android:pathData="M49.5,45.5L54,50" />
+    <path android:strokeColor="#FFFFC247" android:strokeWidth="3.6" android:strokeLineCap="round" android:pathData="M14,50L18.5,45.5" />
+    <path android:strokeColor="#FFFFC247" android:strokeWidth="3.6" android:strokeLineCap="round" android:pathData="M49.5,14.5L54,10" />
+
+    <!-- sun -->
+    <path
+        android:fillColor="#FFFFA726"
+        android:pathData="M34,14a16,16 0,1 0,0.01 0z" />
+    <path
+        android:fillColor="#33FFFFFF"
+        android:pathData="M29,18a7,7 0,1 0,0.01 0z" />
+
+    <!-- cloud shadow -->
+    <path
+        android:fillColor="#4A6AA4C8"
+        android:pathData="M25,77c-9.5,0 -17,-6.2 -17,-14.5S15.5,48 25,48c3.2,-13.2 14.2,-22.5 27.5,-22.5 15.4,0 28,11.8 29.1,27H84c10.7,0 19,7.5 19,17.1S94.7,87 84,87H25c-9.5,0 -17,-3.8 -20,-10 5.3,2.4 11.8,3.2 20,3.2z" />
+
+    <!-- main white cloud -->
+    <path
+        android:fillColor="#FFF9FCFF"
+        android:pathData="M23,73c-9.5,0 -17,-6.2 -17,-14.5S13.5,44 23,44c3.2,-13.2 14.2,-22.5 27.5,-22.5 15.4,0 28,11.8 29.1,27H82c10.7,0 19,7.5 19,17.1S92.7,83 82,83H23z" />
+
+    <!-- cool lower cloud shading -->
+    <path
+        android:fillColor="#66CFE8F7"
+        android:pathData="M18,72c8,3 20,4 34,4 20,0 34,-3 45,-9 -1,9 -8,16 -18,16H23c-7.5,0 -13.5,-3.8 -16,-9.5 3,0.2 6.7,-0.2 11,-1.5z" />
+
+    <!-- cloud highlight -->
+    <path
+        android:fillColor="#99FFFFFF"
+        android:pathData="M31,40c4.5,-7.5 11,-11.5 19,-11.5 8.5,0 15.5,3.9 20,10.3 -6.4,-4.5 -13.4,-6.4 -20.8,-6.4 -6.7,0 -12.8,2.6 -18.2,7.6z" />
+</vector>
