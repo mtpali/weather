@@ -1,0 +1,12 @@
+{
+  "name": "هوای ایران",
+  "short_name": "هوا",
+  "lang": "fa",
+  "dir": "rtl",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#060b16",
+  "theme_color": "#0b1120",
+  "description": "هواشناسی فارسی برای شهرهای ایران با پیش‌فرض رامسر",
+  "icons": []
+}
