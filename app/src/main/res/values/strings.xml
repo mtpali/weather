@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">هوای ایران</string>
+    <string name="location_permission_title">دسترسی به موقعیت مکانی</string>
+    <string name="location_permission_body">برای نمایش هوای موقعیت فعلی شما، اجازه دسترسی به موقعیت مکانی لازم است.</string>
+</resources>
