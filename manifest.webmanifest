@@ -4,9 +4,18 @@
   "lang": "fa",
   "dir": "rtl",
   "start_url": "./",
+  "scope": "./",
   "display": "standalone",
-  "background_color": "#060b16",
-  "theme_color": "#0b1120",
-  "description": "هواشناسی فارسی برای شهرهای ایران با پیش‌فرض رامسر",
-  "icons": []
+  "orientation": "any",
+  "background_color": "#060b14",
+  "theme_color": "#09111f",
+  "description": "هواشناسی فارسی و مدرن برای شهرهای ایران با پیش‌فرض رامسر",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
 }
