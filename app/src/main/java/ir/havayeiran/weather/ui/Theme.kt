@@ -45,30 +45,30 @@ val Vazirmatn = FontFamily(
 )
 
 private val DarkColors = darkColorScheme(
-    primary = Color(0xFF8BB8FF),
-    onPrimary = Color(0xFF071A32),
-    secondary = Color(0xFF74DCEF),
-    background = Color(0xFF06101D),
-    onBackground = Color(0xFFF3F7FF),
-    surface = Color(0xFF0D1A2B),
-    onSurface = Color(0xFFF3F7FF),
-    surfaceVariant = Color(0xFF14243A),
-    onSurfaceVariant = Color(0xFFB8C8DC),
-    outline = Color(0xFF31455F),
-    error = Color(0xFFFF8C8C)
+    primary = Color(0xFFFFD000),
+    onPrimary = Color(0xFF262100),
+    secondary = Color(0xFF72A9FF),
+    background = Color(0xFF202328),
+    onBackground = Color(0xFFF1F3F4),
+    surface = Color(0xFF25292F),
+    onSurface = Color(0xFFF1F3F4),
+    surfaceVariant = Color(0xFF2B2F36),
+    onSurfaceVariant = Color(0xFFADB2BA),
+    outline = Color(0xFF3B4048),
+    error = Color(0xFFFF9A9A)
 )
 
 private val LightColors = lightColorScheme(
-    primary = Color(0xFF2866B2),
+    primary = Color(0xFFB58500),
     onPrimary = Color.White,
-    secondary = Color(0xFF047D91),
-    background = Color(0xFFF3F7FC),
-    onBackground = Color(0xFF0E1B2A),
+    secondary = Color(0xFF2866B2),
+    background = Color(0xFFF4F6F8),
+    onBackground = Color(0xFF202328),
     surface = Color(0xFFFFFFFF),
-    onSurface = Color(0xFF0E1B2A),
-    surfaceVariant = Color(0xFFE8F0F8),
-    onSurfaceVariant = Color(0xFF52657A),
-    outline = Color(0xFFC7D4E2),
+    onSurface = Color(0xFF202328),
+    surfaceVariant = Color(0xFFE9EDF1),
+    onSurfaceVariant = Color(0xFF626870),
+    outline = Color(0xFFD0D5DB),
     error = Color(0xFFB3261E)
 )
 
