@@ -11,13 +11,16 @@ android {
         applicationId = "ir.weather.mobiletina"
         minSdk = 26
         targetSdk = 36
-        versionCode = 7
-        versionName = "1.6.1"
+        versionCode = 8
+        versionName = "1.7.0"
     }
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
+            isDebuggable = false
+            signingConfig = signingConfigs.getByName("debug")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
