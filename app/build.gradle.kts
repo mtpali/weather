@@ -4,15 +4,15 @@ plugins {
 }
 
 android {
-    namespace = "ir.havayeiran.weather"
+    namespace = "ir.weather.mobiletina"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "ir.havayeiran.weather"
+        applicationId = "ir.weather.mobiletina"
         minSdk = 26
         targetSdk = 36
-        versionCode = 1
-        versionName = "1.0.0"
+        versionCode = 5
+        versionName = "1.5.0"
     }
 
     buildTypes {
