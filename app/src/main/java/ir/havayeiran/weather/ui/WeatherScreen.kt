@@ -20,12 +20,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.weight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Close
@@ -155,9 +153,7 @@ fun WeatherScreen(
                 }
 
                 if (!state.errorMessage.isNullOrBlank()) {
-                    item {
-                        ErrorStrip(state.errorMessage, onRefresh)
-                    }
+                    item { ErrorStrip(state.errorMessage, onRefresh) }
                 }
 
                 if (state.isLoading && state.weather == null) {
@@ -174,7 +170,6 @@ fun WeatherScreen(
                                 mutedColor = muted
                             )
                         }
-
                         item {
                             ForecastTabs(
                                 selected = forecastMode,
@@ -183,7 +178,6 @@ fun WeatherScreen(
                                 mutedColor = muted
                             )
                         }
-
                         item {
                             HourlyGraph(
                                 bundle = bundle,
@@ -192,7 +186,6 @@ fun WeatherScreen(
                                 mutedColor = muted
                             )
                         }
-
                         item {
                             DailyForecastStrip(
                                 bundle = bundle,
@@ -200,7 +193,6 @@ fun WeatherScreen(
                                 mutedColor = muted
                             )
                         }
-
                         item {
                             MoreDetailsSection(
                                 bundle = bundle,
@@ -212,7 +204,6 @@ fun WeatherScreen(
                                 mutedColor = muted
                             )
                         }
-
                         item {
                             QuickCitiesStrip(
                                 selected = state.selectedLocation,
@@ -222,13 +213,10 @@ fun WeatherScreen(
                                 mutedColor = muted
                             )
                         }
-
                         item {
                             Text(
                                 text = "داده‌های هواشناسی: Open-Meteo",
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(top = 22.dp, bottom = 12.dp),
+                                modifier = Modifier.fillMaxWidth().padding(top = 22.dp, bottom = 12.dp),
                                 textAlign = TextAlign.Center,
                                 style = MaterialTheme.typography.bodySmall,
                                 color = muted.copy(alpha = .7f)
@@ -252,46 +240,26 @@ private fun HeaderBar(
     mutedColor: Color
 ) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 14.dp, vertical = 9.dp),
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 9.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Icon(
-            Icons.Rounded.LocationOn,
-            contentDescription = null,
-            tint = textColor,
-            modifier = Modifier.size(21.dp)
-        )
+        Icon(Icons.Rounded.LocationOn, null, tint = textColor, modifier = Modifier.size(21.dp))
         Spacer(Modifier.width(6.dp))
         Column(Modifier.weight(1f)) {
             Text(
-                text = if (state.selectedLocation.province.isBlank()) {
-                    state.selectedLocation.name
-                } else {
-                    "${state.selectedLocation.name}، ${state.selectedLocation.province}"
-                },
+                text = if (state.selectedLocation.province.isBlank()) state.selectedLocation.name else "${state.selectedLocation.name}، ${state.selectedLocation.province}",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 color = textColor,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
-            Text(
-                text = "ایران · انتخاب منطقه",
-                style = MaterialTheme.typography.bodySmall,
-                color = GoogleBlue
-            )
+            Text("ایران · انتخاب منطقه", style = MaterialTheme.typography.bodySmall, color = GoogleBlue)
         }
         CompactAction(Icons.Rounded.Search, if (searchOpen) "بستن جستجو" else "جستجو", onSearchToggle, textColor)
         CompactAction(Icons.Rounded.MyLocation, "موقعیت من", onLocate, textColor)
         CompactAction(Icons.Rounded.Refresh, "به‌روزرسانی", onRefresh, textColor)
-        Icon(
-            Icons.Rounded.MoreVert,
-            contentDescription = null,
-            tint = mutedColor,
-            modifier = Modifier.size(21.dp)
-        )
+        Icon(Icons.Rounded.MoreVert, null, tint = mutedColor, modifier = Modifier.size(21.dp))
     }
 }
 
@@ -314,11 +282,7 @@ private fun SearchArea(
     onClearSearch: () -> Unit,
     onSearchResult: (CitySearchResult) -> Unit
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 14.dp, vertical = 4.dp)
-    ) {
+    Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 4.dp)) {
         OutlinedTextField(
             value = state.searchQuery,
             onValueChange = onSearchChange,
@@ -327,9 +291,7 @@ private fun SearchArea(
             leadingIcon = { Icon(Icons.Rounded.Search, null) },
             trailingIcon = {
                 if (state.searchQuery.isNotEmpty()) {
-                    IconButton(onClick = onClearSearch) {
-                        Icon(Icons.Rounded.Close, "پاک کردن")
-                    }
+                    IconButton(onClick = onClearSearch) { Icon(Icons.Rounded.Close, "پاک کردن") }
                 }
             },
             singleLine = true,
@@ -338,9 +300,7 @@ private fun SearchArea(
 
         if (state.searchQuery.trim().length >= 2) {
             Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 7.dp),
+                modifier = Modifier.fillMaxWidth().padding(top = 7.dp),
                 colors = CardDefaults.cardColors(containerColor = GooglePanel),
                 shape = RoundedCornerShape(18.dp),
                 border = BorderStroke(1.dp, Color.White.copy(alpha = .06f))
@@ -361,11 +321,7 @@ private fun SearchArea(
                     } else {
                         state.searchResults.take(7).forEach { result ->
                             Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clip(RoundedCornerShape(13.dp))
-                                    .clickable { onSearchResult(result) }
-                                    .padding(horizontal = 10.dp, vertical = 10.dp),
+                                modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(13.dp)).clickable { onSearchResult(result) }.padding(horizontal = 10.dp, vertical = 10.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Icon(Icons.Rounded.LocationOn, null, tint = GoogleBlue, modifier = Modifier.size(17.dp))
@@ -395,19 +351,9 @@ private fun MainWeatherOverview(
     val today = bundle.daily.firstOrNull()
     val dayAndTime = "${formatPersianDate(current.time).substringBefore('،')} ${formatTime(current.time)}"
 
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 24.dp, vertical = 24.dp)
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(
-                modifier = Modifier.weight(.9f),
-                horizontalAlignment = Alignment.Start
-            ) {
+    Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 24.dp)) {
+        Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Column(modifier = Modifier.weight(.9f), horizontalAlignment = Alignment.Start) {
                 Text("آب و هوا", color = textColor, fontSize = 18.sp, fontWeight = FontWeight.Medium)
                 Spacer(Modifier.height(5.dp))
                 Text(dayAndTime, color = mutedColor, fontSize = 16.sp)
@@ -423,7 +369,7 @@ private fun MainWeatherOverview(
                 Column(horizontalAlignment = Alignment.End) {
                     Row(verticalAlignment = Alignment.Top) {
                         Text(
-                            text = current.temperature.fa(),
+                            current.temperature.fa(),
                             color = textColor,
                             fontFamily = Vazirmatn,
                             fontWeight = FontWeight.Light,
@@ -432,11 +378,7 @@ private fun MainWeatherOverview(
                         )
                         Text("°C", color = textColor, fontSize = 22.sp, modifier = Modifier.padding(top = 8.dp))
                     }
-                    Text(
-                        text = "°C  |  °F",
-                        color = mutedColor,
-                        style = MaterialTheme.typography.bodySmall
-                    )
+                    Text("°C  |  °F", color = mutedColor, style = MaterialTheme.typography.bodySmall)
                 }
                 Spacer(Modifier.width(8.dp))
                 WeatherArtwork(
@@ -448,7 +390,6 @@ private fun MainWeatherOverview(
         }
 
         Spacer(Modifier.height(4.dp))
-
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.End,
@@ -462,15 +403,13 @@ private fun MainWeatherOverview(
             Spacer(Modifier.width(16.dp))
             IconButton(onClick = onToggleFavorite, modifier = Modifier.size(38.dp)) {
                 Icon(
-                    imageVector = if (isFavorite) Icons.Rounded.Favorite else Icons.Rounded.FavoriteBorder,
-                    contentDescription = "علاقه‌مندی",
+                    if (isFavorite) Icons.Rounded.Favorite else Icons.Rounded.FavoriteBorder,
+                    "علاقه‌مندی",
                     tint = if (isFavorite) Color(0xFFFF758E) else mutedColor,
                     modifier = Modifier.size(20.dp)
                 )
             }
-            if (refreshing) {
-                CircularProgressIndicator(Modifier.size(16.dp), strokeWidth = 2.dp, color = GoogleGold)
-            }
+            if (refreshing) CircularProgressIndicator(Modifier.size(16.dp), strokeWidth = 2.dp, color = GoogleGold)
         }
     }
 }
@@ -482,12 +421,7 @@ private fun ForecastTabs(
     textColor: Color,
     mutedColor: Color
 ) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 24.dp),
-        horizontalArrangement = Arrangement.End
-    ) {
+    Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp), horizontalArrangement = Arrangement.End) {
         ForecastTab("هوا", ForecastMode.WEATHER, selected, onSelect, textColor, mutedColor)
         ForecastTab("بارش", ForecastMode.RAIN, selected, onSelect, textColor, mutedColor)
         ForecastTab("باد", ForecastMode.WIND, selected, onSelect, textColor, mutedColor)
@@ -504,9 +438,7 @@ private fun ForecastTab(
     mutedColor: Color
 ) {
     Column(
-        modifier = Modifier
-            .clickable { onSelect(mode) }
-            .padding(horizontal = 11.dp, vertical = 7.dp),
+        modifier = Modifier.clickable { onSelect(mode) }.padding(horizontal = 11.dp, vertical = 7.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
@@ -516,12 +448,7 @@ private fun ForecastTab(
             style = MaterialTheme.typography.bodyMedium
         )
         Spacer(Modifier.height(7.dp))
-        Box(
-            modifier = Modifier
-                .width(28.dp)
-                .height(3.dp)
-                .background(if (selected == mode) GoogleGold else Color.Transparent)
-        )
+        Box(Modifier.width(28.dp).height(3.dp).background(if (selected == mode) GoogleGold else Color.Transparent))
     }
 }
 
@@ -546,26 +473,17 @@ private fun HourlyGraph(
             ForecastMode.WIND -> it.windSpeed
         }
     }
-
     val suffix = when (mode) {
         ForecastMode.WEATHER -> "°"
         ForecastMode.RAIN -> "٪"
         ForecastMode.WIND -> ""
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 28.dp, bottom = 12.dp)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 24.dp)
-        ) {
+    Column(modifier = Modifier.fillMaxWidth().padding(top = 28.dp, bottom = 12.dp)) {
+        Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp)) {
             values.forEach { value ->
                 Text(
-                    text = "${value.fa()}$suffix",
+                    "${value.fa()}$suffix",
                     modifier = Modifier.weight(1f),
                     color = textColor.copy(alpha = .78f),
                     textAlign = TextAlign.Center,
@@ -575,18 +493,12 @@ private fun HourlyGraph(
             }
         }
 
-        Canvas(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(120.dp)
-                .padding(horizontal = 24.dp, vertical = 8.dp)
-        ) {
+        Canvas(modifier = Modifier.fillMaxWidth().height(120.dp).padding(horizontal = 24.dp, vertical = 8.dp)) {
             if (values.size < 2) return@Canvas
             val rawMin = values.minOrNull() ?: 0.0
             val rawMax = values.maxOrNull() ?: 1.0
             val minValue = when (mode) {
-                ForecastMode.RAIN -> 0.0
-                ForecastMode.WIND -> 0.0
+                ForecastMode.RAIN, ForecastMode.WIND -> 0.0
                 ForecastMode.WEATHER -> rawMin - 2.0
             }
             val maxValue = when (mode) {
@@ -596,12 +508,11 @@ private fun HourlyGraph(
             }
             val span = (maxValue - minValue).coerceAtLeast(1.0)
             val points = values.mapIndexed { index, value ->
-                val x = index * size.width / (values.lastIndex.coerceAtLeast(1))
+                val x = index * size.width / values.lastIndex.coerceAtLeast(1)
                 val normalized = ((value - minValue) / span).toFloat().coerceIn(0f, 1f)
                 val y = size.height - normalized * (size.height * .78f) - size.height * .07f
                 Offset(x, y)
             }
-
             val area = Path().apply {
                 moveTo(points.first().x, size.height)
                 lineTo(points.first().x, points.first().y)
@@ -613,33 +524,22 @@ private fun HourlyGraph(
                 moveTo(points.first().x, points.first().y)
                 for (i in 1 until points.size) lineTo(points[i].x, points[i].y)
             }
-
             drawPath(
-                path = area,
+                area,
                 brush = Brush.verticalGradient(
-                    colors = listOf(GoogleGold.copy(alpha = .31f), GoogleGold.copy(alpha = .08f)),
+                    listOf(GoogleGold.copy(alpha = .31f), GoogleGold.copy(alpha = .08f)),
                     startY = 0f,
                     endY = size.height
                 )
             )
-            drawPath(
-                path = line,
-                color = GoogleGold,
-                style = Stroke(width = 3.dp.toPx(), cap = StrokeCap.Round)
-            )
-            points.forEach { point ->
-                drawCircle(color = GoogleGold, radius = 2.7.dp.toPx(), center = point)
-            }
+            drawPath(line, color = GoogleGold, style = Stroke(width = 3.dp.toPx(), cap = StrokeCap.Round))
+            points.forEach { drawCircle(GoogleGold, radius = 2.7.dp.toPx(), center = it) }
         }
 
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-        ) {
+        Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)) {
             spaced.forEachIndexed { index, hour ->
                 Text(
-                    text = if (index == 0) "اکنون" else formatTime(hour.time),
+                    if (index == 0) "اکنون" else formatTime(hour.time),
                     modifier = Modifier.weight(1f),
                     color = mutedColor,
                     textAlign = TextAlign.Center,
@@ -651,15 +551,9 @@ private fun HourlyGraph(
 }
 
 @Composable
-private fun DailyForecastStrip(
-    bundle: WeatherBundle,
-    textColor: Color,
-    mutedColor: Color
-) {
+private fun DailyForecastStrip(bundle: WeatherBundle, textColor: Color, mutedColor: Color) {
     LazyRow(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 18.dp),
+        modifier = Modifier.fillMaxWidth().padding(top = 18.dp),
         contentPadding = PaddingValues(horizontal = 16.dp),
         horizontalArrangement = Arrangement.spacedBy(5.dp)
     ) {
@@ -671,20 +565,11 @@ private fun DailyForecastStrip(
                     .width(92.dp)
                     .clip(RoundedCornerShape(14.dp))
                     .background(if (active) GooglePanelSelected else Color.Transparent)
-                    .border(
-                        1.dp,
-                        if (active) Color.White.copy(alpha = .035f) else Color.Transparent,
-                        RoundedCornerShape(14.dp)
-                    )
+                    .border(1.dp, if (active) Color.White.copy(alpha = .035f) else Color.Transparent, RoundedCornerShape(14.dp))
                     .padding(vertical = 12.dp, horizontal = 7.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(
-                    forecastDayName(day.date, index),
-                    color = textColor,
-                    fontWeight = FontWeight.Bold,
-                    style = MaterialTheme.typography.bodyMedium
-                )
+                Text(forecastDayName(day.date, index), color = textColor, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.bodyMedium)
                 WeatherGlyph(day.weatherCode, modifier = Modifier.size(48.dp).padding(top = 4.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text("${day.maxTemperature.fa()}°", color = textColor, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
@@ -706,25 +591,13 @@ private fun MoreDetailsSection(
     textColor: Color,
     mutedColor: Color
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 20.dp)
-    ) {
+    Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 20.dp)) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(14.dp))
-                .clickable { onToggle() }
-                .padding(horizontal = 9.dp, vertical = 8.dp),
+            modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).clickable { onToggle() }.padding(horizontal = 9.dp, vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text("جزئیات بیشتر", modifier = Modifier.weight(1f), color = textColor, fontWeight = FontWeight.Medium)
-            Icon(
-                if (expanded) Icons.Rounded.KeyboardArrowUp else Icons.Rounded.KeyboardArrowDown,
-                contentDescription = null,
-                tint = mutedColor
-            )
+            Icon(if (expanded) Icons.Rounded.KeyboardArrowUp else Icons.Rounded.KeyboardArrowDown, null, tint = mutedColor)
         }
 
         if (expanded) {
@@ -756,7 +629,6 @@ private fun MoreDetailsSection(
                     "PM2.5 ${aqi.pm25.fa(1)}  ·  PM10 ${aqi.pm10.fa(1)}"
                 )
             }
-
             bundle.marine?.let { marine ->
                 if (marine.seaSurfaceTemperature != null || marine.waveHeight != null) {
                     Spacer(Modifier.height(8.dp))
@@ -771,10 +643,7 @@ private fun MoreDetailsSection(
             }
 
             Spacer(Modifier.height(8.dp))
-            Card(
-                colors = CardDefaults.cardColors(containerColor = GooglePanel.copy(alpha = .72f)),
-                shape = RoundedCornerShape(17.dp)
-            ) {
+            Card(colors = CardDefaults.cardColors(containerColor = GooglePanel.copy(alpha = .72f)), shape = RoundedCornerShape(17.dp)) {
                 Row(
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp),
                     verticalAlignment = Alignment.CenterVertically
@@ -784,11 +653,7 @@ private fun MoreDetailsSection(
                         Text(if (state.darkMode) "حالت تیره فعال است" else "حالت روشن فعال است", color = mutedColor, style = MaterialTheme.typography.bodySmall)
                     }
                     IconButton(onClick = onToggleTheme) {
-                        Icon(
-                            if (state.darkMode) Icons.Rounded.LightMode else Icons.Rounded.DarkMode,
-                            contentDescription = "تغییر تم",
-                            tint = GoogleGold
-                        )
+                        Icon(if (state.darkMode) Icons.Rounded.LightMode else Icons.Rounded.DarkMode, "تغییر تم", tint = GoogleGold)
                     }
                 }
             }
@@ -835,10 +700,7 @@ private fun QuickCitiesStrip(
     Column(Modifier.fillMaxWidth().padding(horizontal = 16.dp)) {
         Text("شهرهای منتخب", color = textColor, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Medium)
         Spacer(Modifier.height(8.dp))
-        Row(
-            modifier = Modifier.horizontalScroll(rememberScrollState()),
-            horizontalArrangement = Arrangement.spacedBy(7.dp)
-        ) {
+        Row(modifier = Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(7.dp)) {
             cities.forEach { city ->
                 val active = near(city, selected)
                 val favorite = favorites.any { near(it, city) }
