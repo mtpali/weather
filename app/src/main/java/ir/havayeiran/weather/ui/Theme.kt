@@ -11,7 +11,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.googlefonts.GoogleFont
 import androidx.compose.ui.unit.sp
-import ir.havayeiran.weather.R
+import ir.weather.mobiletina.R
 
 private val GoogleFontsProvider = GoogleFont.Provider(
     providerAuthority = "com.google.android.gms.fonts",
