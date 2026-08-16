@@ -61,9 +61,13 @@ class WeatherRepository {
             append("&longitude=${location.longitude}")
             append("&timezone=auto")
             append("&forecast_days=10")
+            append("&cell_selection=land")
+            append("&temperature_unit=celsius")
+            append("&wind_speed_unit=kmh")
+            append("&precipitation_unit=mm")
             append("&current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,weather_code,cloud_cover,pressure_msl,wind_speed_10m,wind_direction_10m,wind_gusts_10m,visibility")
-            append("&hourly=temperature_2m,apparent_temperature,precipitation_probability,weather_code,wind_speed_10m,relative_humidity_2m")
-            append("&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,precipitation_probability_max,precipitation_sum,wind_speed_10m_max,uv_index_max")
+            append("&hourly=temperature_2m,apparent_temperature,relative_humidity_2m,precipitation_probability,precipitation,rain,showers,snowfall,weather_code,cloud_cover,wind_speed_10m,wind_gusts_10m,is_day")
+            append("&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,precipitation_probability_max,precipitation_sum,rain_sum,showers_sum,snowfall_sum,precipitation_hours,wind_speed_10m_max,uv_index_max")
         }
         val root = fetchJson(url)
         val currentJson = root.getJSONObject("current")
@@ -89,10 +93,17 @@ class WeatherRepository {
         val hTime = hourlyJson.getJSONArray("time")
         val hTemp = hourlyJson.getJSONArray("temperature_2m")
         val hFeels = hourlyJson.getJSONArray("apparent_temperature")
-        val hRain = hourlyJson.getJSONArray("precipitation_probability")
+        val hRainProbability = hourlyJson.getJSONArray("precipitation_probability")
+        val hPrecipitation = hourlyJson.getJSONArray("precipitation")
+        val hRain = hourlyJson.getJSONArray("rain")
+        val hShowers = hourlyJson.getJSONArray("showers")
+        val hSnowfall = hourlyJson.getJSONArray("snowfall")
         val hCode = hourlyJson.getJSONArray("weather_code")
+        val hCloud = hourlyJson.getJSONArray("cloud_cover")
         val hWind = hourlyJson.getJSONArray("wind_speed_10m")
+        val hGust = hourlyJson.getJSONArray("wind_gusts_10m")
         val hHumidity = hourlyJson.getJSONArray("relative_humidity_2m")
+        val hIsDay = hourlyJson.getJSONArray("is_day")
         val hourly = buildList {
             for (i in 0 until hTime.length()) {
                 add(
@@ -100,10 +111,17 @@ class WeatherRepository {
                         time = hTime.optString(i),
                         temperature = hTemp.safeDouble(i),
                         apparentTemperature = hFeels.safeDouble(i),
-                        precipitationProbability = hRain.safeInt(i),
+                        precipitationProbability = hRainProbability.safeInt(i),
                         weatherCode = hCode.safeInt(i),
                         windSpeed = hWind.safeDouble(i),
-                        humidity = hHumidity.safeInt(i)
+                        humidity = hHumidity.safeInt(i),
+                        isDay = hIsDay.safeInt(i) == 1,
+                        precipitation = hPrecipitation.safeDouble(i),
+                        rain = hRain.safeDouble(i),
+                        showers = hShowers.safeDouble(i),
+                        snowfall = hSnowfall.safeDouble(i),
+                        cloudCover = hCloud.safeInt(i),
+                        windGust = hGust.safeDouble(i)
                     )
                 )
             }
@@ -115,8 +133,12 @@ class WeatherRepository {
         val dMin = dailyJson.getJSONArray("temperature_2m_min")
         val dSunrise = dailyJson.getJSONArray("sunrise")
         val dSunset = dailyJson.getJSONArray("sunset")
-        val dRain = dailyJson.getJSONArray("precipitation_probability_max")
-        val dRainSum = dailyJson.getJSONArray("precipitation_sum")
+        val dRainProbability = dailyJson.getJSONArray("precipitation_probability_max")
+        val dPrecipitation = dailyJson.getJSONArray("precipitation_sum")
+        val dRainSum = dailyJson.getJSONArray("rain_sum")
+        val dShowersSum = dailyJson.getJSONArray("showers_sum")
+        val dSnowfallSum = dailyJson.getJSONArray("snowfall_sum")
+        val dPrecipitationHours = dailyJson.getJSONArray("precipitation_hours")
         val dWind = dailyJson.getJSONArray("wind_speed_10m_max")
         val dUv = dailyJson.getJSONArray("uv_index_max")
         val daily = buildList {
@@ -129,10 +151,14 @@ class WeatherRepository {
                         minTemperature = dMin.safeDouble(i),
                         sunrise = dSunrise.optString(i),
                         sunset = dSunset.optString(i),
-                        precipitationProbability = dRain.safeInt(i),
-                        precipitationSum = dRainSum.safeDouble(i),
+                        precipitationProbability = dRainProbability.safeInt(i),
+                        precipitationSum = dPrecipitation.safeDouble(i),
                         maxWindSpeed = dWind.safeDouble(i),
-                        uvIndex = dUv.safeDouble(i)
+                        uvIndex = dUv.safeDouble(i),
+                        rainSum = dRainSum.safeDouble(i),
+                        showersSum = dShowersSum.safeDouble(i),
+                        snowfallSum = dSnowfallSum.safeDouble(i),
+                        precipitationHours = dPrecipitationHours.safeDouble(i)
                     )
                 )
             }
@@ -186,22 +212,37 @@ class WeatherRepository {
         location.latitude in 35.5..39.8 && location.longitude in 48.0..55.5
 
     private fun fetchJson(url: String): JSONObject {
-        val connection = (URI(url).toURL().openConnection() as HttpURLConnection).apply {
-            requestMethod = "GET"
-            connectTimeout = 12_000
-            readTimeout = 15_000
-            setRequestProperty("Accept", "application/json")
-            setRequestProperty("User-Agent", "HavayeIran-Android/1.0")
+        var lastError: Throwable? = null
+        repeat(2) { attempt ->
+            try {
+                val connection = (URI(url).toURL().openConnection() as HttpURLConnection).apply {
+                    requestMethod = "GET"
+                    connectTimeout = 10_000
+                    readTimeout = 14_000
+                    useCaches = false
+                    setRequestProperty("Accept", "application/json")
+                    setRequestProperty("Cache-Control", "no-cache")
+                    setRequestProperty("User-Agent", "weather-mobiletina/1.7")
+                }
+                try {
+                    val code = connection.responseCode
+                    val stream = if (code in 200..299) connection.inputStream else connection.errorStream
+                    val body = BufferedReader(stream.reader()).use { it.readText() }
+                    if (code in 200..299) return JSONObject(body)
+                    if ((code == 429 || code >= 500) && attempt == 0) {
+                        Thread.sleep(300)
+                    } else {
+                        error("خطای سرویس هواشناسی ($code)")
+                    }
+                } finally {
+                    connection.disconnect()
+                }
+            } catch (error: Throwable) {
+                lastError = error
+                if (attempt == 0) Thread.sleep(250)
+            }
         }
-        try {
-            val code = connection.responseCode
-            val stream = if (code in 200..299) connection.inputStream else connection.errorStream
-            val body = BufferedReader(stream.reader()).use { it.readText() }
-            if (code !in 200..299) error("خطای سرویس هواشناسی ($code)")
-            return JSONObject(body)
-        } finally {
-            connection.disconnect()
-        }
+        throw lastError ?: IllegalStateException("دریافت اطلاعات هواشناسی ناموفق بود.")
     }
 
     private fun JSONArray.safeDouble(index: Int): Double = when (val value = opt(index)) {
