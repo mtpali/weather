@@ -33,7 +33,14 @@ data class HourlyWeather(
     val precipitationProbability: Int,
     val weatherCode: Int,
     val windSpeed: Double,
-    val humidity: Int
+    val humidity: Int,
+    val isDay: Boolean = true,
+    val precipitation: Double = 0.0,
+    val rain: Double = 0.0,
+    val showers: Double = 0.0,
+    val snowfall: Double = 0.0,
+    val cloudCover: Int = 0,
+    val windGust: Double = 0.0
 )
 
 data class DailyWeather(
@@ -46,7 +53,11 @@ data class DailyWeather(
     val precipitationProbability: Int,
     val precipitationSum: Double,
     val maxWindSpeed: Double,
-    val uvIndex: Double
+    val uvIndex: Double,
+    val rainSum: Double = 0.0,
+    val showersSum: Double = 0.0,
+    val snowfallSum: Double = 0.0,
+    val precipitationHours: Double = 0.0
 )
 
 data class AirQuality(
