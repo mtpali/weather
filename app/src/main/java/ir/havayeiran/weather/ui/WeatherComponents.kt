@@ -40,6 +40,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -57,6 +58,13 @@ import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
 
+private val SunOrange = Color(0xFFFF8A00)
+private val SunYellow = Color(0xFFFFC928)
+private val CloudTop = Color(0xFFF2F3F5)
+private val CloudMid = Color(0xFFD9DCE1)
+private val CloudRain = Color(0xFFC8CCD2)
+private val RainBlue = Color(0xFF0B73E0)
+
 @Composable
 fun WeatherArtwork(
     kind: WeatherKind,
@@ -65,86 +73,117 @@ fun WeatherArtwork(
 ) {
     val transition = rememberInfiniteTransition(label = "weather-art")
     val cloudShift by transition.animateFloat(
-        initialValue = -8f,
-        targetValue = 10f,
+        initialValue = -4f,
+        targetValue = 5f,
         animationSpec = infiniteRepeatable(
-            animation = tween(5500, easing = LinearEasing),
+            animation = tween(5200, easing = LinearEasing),
             repeatMode = RepeatMode.Reverse
         ),
         label = "cloud-shift"
     )
-    val fall by transition.animateFloat(
-        initialValue = 0f,
-        targetValue = 1f,
+    val dropPulse by transition.animateFloat(
+        initialValue = .92f,
+        targetValue = 1.05f,
         animationSpec = infiniteRepeatable(
-            animation = tween(1100, easing = LinearEasing),
-            repeatMode = RepeatMode.Restart
+            animation = tween(900, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse
         ),
-        label = "fall"
+        label = "drop-pulse"
     )
 
     Canvas(modifier = modifier) {
         val w = size.width
         val h = size.height
 
-        if (isDay && kind in listOf(WeatherKind.CLEAR, WeatherKind.PARTLY_CLOUDY)) {
-            drawSun(Offset(w * .67f, h * .31f), w * .12f)
-        } else if (!isDay && kind in listOf(WeatherKind.CLEAR, WeatherKind.PARTLY_CLOUDY)) {
-            drawMoon(Offset(w * .68f, h * .29f), w * .115f)
-        }
-
         when (kind) {
-            WeatherKind.CLEAR -> Unit
-            WeatherKind.PARTLY_CLOUDY -> drawCloud(Offset(w * .47f + cloudShift, h * .56f), w * .28f, Color(0xFFF1F5FA))
+            WeatherKind.CLEAR -> {
+                if (isDay) drawGoogleSun(Offset(w * .52f, h * .50f), w * .24f, rays = true)
+                else drawMoon(Offset(w * .54f, h * .48f), w * .23f)
+            }
+
+            WeatherKind.PARTLY_CLOUDY -> {
+                if (isDay) drawGoogleSun(Offset(w * .58f, h * .36f), w * .21f, rays = false)
+                else drawMoon(Offset(w * .61f, h * .34f), w * .19f)
+                drawGoogleCloud(
+                    center = Offset(w * .46f + cloudShift, h * .62f),
+                    width = w * .58f,
+                    topColor = CloudTop,
+                    bottomColor = CloudMid
+                )
+            }
+
             WeatherKind.CLOUDY -> {
-                drawCloud(Offset(w * .58f + cloudShift * .5f, h * .43f), w * .25f, Color(0xFFCBD5E2).copy(alpha = .72f))
-                drawCloud(Offset(w * .42f + cloudShift, h * .59f), w * .31f, Color(0xFFE7EDF5))
+                drawGoogleCloud(
+                    center = Offset(w * .50f + cloudShift * .25f, h * .55f),
+                    width = w * .67f,
+                    topColor = CloudMid,
+                    bottomColor = Color(0xFFBFC3C9)
+                )
             }
+
             WeatherKind.FOG -> {
-                drawCloud(Offset(w * .48f + cloudShift * .4f, h * .42f), w * .28f, Color(0xFFD9E0E7).copy(alpha = .75f))
+                drawGoogleCloud(
+                    center = Offset(w * .50f + cloudShift * .2f, h * .42f),
+                    width = w * .61f,
+                    topColor = CloudMid,
+                    bottomColor = Color(0xFFBEC4CB)
+                )
                 repeat(3) { i ->
-                    val y = h * (.62f + i * .1f)
+                    val y = h * (.68f + i * .09f)
                     drawLine(
-                        color = Color.White.copy(alpha = .35f - i * .06f),
-                        start = Offset(w * .22f, y),
-                        end = Offset(w * .78f, y),
-                        strokeWidth = 5f,
+                        color = Color.White.copy(alpha = .42f - i * .07f),
+                        start = Offset(w * .20f, y),
+                        end = Offset(w * .80f, y),
+                        strokeWidth = w * .035f,
                         cap = StrokeCap.Round
                     )
                 }
             }
-            WeatherKind.RAIN, WeatherKind.STORM -> {
-                drawCloud(Offset(w * .48f + cloudShift * .4f, h * .42f), w * .31f, Color(0xFFD9E2EC))
-                repeat(7) { i ->
-                    val x = w * (.25f + i * .08f)
-                    val y = h * (.61f + ((i * .17f + fall) % 1f) * .23f)
-                    drawLine(
-                        color = Color(0xFF63B9FF).copy(alpha = .88f),
-                        start = Offset(x, y),
-                        end = Offset(x - 8f, y + 22f),
-                        strokeWidth = 5f,
-                        cap = StrokeCap.Round
-                    )
-                }
-                if (kind == WeatherKind.STORM) {
-                    val bolt = androidx.compose.ui.graphics.Path().apply {
-                        moveTo(w * .50f, h * .57f)
-                        lineTo(w * .43f, h * .72f)
-                        lineTo(w * .51f, h * .72f)
-                        lineTo(w * .45f, h * .88f)
-                        lineTo(w * .61f, h * .67f)
-                        lineTo(w * .53f, h * .67f)
-                        close()
-                    }
-                    drawPath(bolt, Color(0xFFFFD85D))
-                }
+
+            WeatherKind.RAIN -> {
+                drawGoogleCloud(
+                    center = Offset(w * .50f + cloudShift * .18f, h * .44f),
+                    width = w * .66f,
+                    topColor = CloudMid,
+                    bottomColor = CloudRain
+                )
+                drawDrop(
+                    center = Offset(w * .58f, h * .79f),
+                    radius = w * .115f * dropPulse,
+                    color = RainBlue
+                )
             }
+
+            WeatherKind.STORM -> {
+                drawGoogleCloud(
+                    center = Offset(w * .50f + cloudShift * .18f, h * .42f),
+                    width = w * .66f,
+                    topColor = CloudMid,
+                    bottomColor = CloudRain
+                )
+                drawDrop(Offset(w * .68f, h * .78f), w * .085f, RainBlue)
+                val bolt = Path().apply {
+                    moveTo(w * .46f, h * .60f)
+                    lineTo(w * .36f, h * .77f)
+                    lineTo(w * .47f, h * .77f)
+                    lineTo(w * .38f, h * .94f)
+                    lineTo(w * .59f, h * .70f)
+                    lineTo(w * .48f, h * .70f)
+                    close()
+                }
+                drawPath(bolt, SunYellow)
+            }
+
             WeatherKind.SNOW -> {
-                drawCloud(Offset(w * .48f + cloudShift * .35f, h * .41f), w * .31f, Color(0xFFE7EDF3))
-                repeat(8) { i ->
-                    val x = w * (.22f + i * .075f)
-                    val y = h * (.59f + ((i * .13f + fall) % 1f) * .28f)
-                    drawCircle(Color.White.copy(alpha = .85f), radius = 5f, center = Offset(x, y))
+                drawGoogleCloud(
+                    center = Offset(w * .50f + cloudShift * .18f, h * .42f),
+                    width = w * .64f,
+                    topColor = CloudTop,
+                    bottomColor = CloudMid
+                )
+                repeat(3) { i ->
+                    val x = w * (.34f + i * .16f)
+                    drawSnowflake(Offset(x, h * .78f), w * .055f)
                 }
             }
         }
@@ -161,31 +200,89 @@ fun WeatherGlyph(
         val kind = weatherKind(code)
         val w = size.width
         val h = size.height
-        if (isDay && kind in listOf(WeatherKind.CLEAR, WeatherKind.PARTLY_CLOUDY)) {
-            drawSun(Offset(w * .64f, h * .35f), w * .16f)
-        } else if (!isDay && kind in listOf(WeatherKind.CLEAR, WeatherKind.PARTLY_CLOUDY)) {
-            drawMoon(Offset(w * .64f, h * .33f), w * .15f)
-        }
+
         when (kind) {
-            WeatherKind.CLEAR -> Unit
-            WeatherKind.PARTLY_CLOUDY -> drawCloud(Offset(w * .46f, h * .58f), w * .34f, Color(0xFFE8EEF5))
-            WeatherKind.CLOUDY -> drawCloud(Offset(w * .50f, h * .55f), w * .36f, Color(0xFFD7DFE9))
+            WeatherKind.CLEAR -> {
+                if (isDay) drawGoogleSun(Offset(w * .50f, h * .49f), w * .25f, rays = true)
+                else drawMoon(Offset(w * .52f, h * .48f), w * .23f)
+            }
+
+            WeatherKind.PARTLY_CLOUDY -> {
+                if (isDay) drawGoogleSun(Offset(w * .58f, h * .34f), w * .22f, rays = false)
+                else drawMoon(Offset(w * .61f, h * .32f), w * .20f)
+                drawGoogleCloud(
+                    center = Offset(w * .45f, h * .62f),
+                    width = w * .66f,
+                    topColor = Color(0xFFF8F8F8),
+                    bottomColor = Color(0xFFD5D8DC)
+                )
+            }
+
+            WeatherKind.CLOUDY -> {
+                drawGoogleCloud(
+                    center = Offset(w * .50f, h * .54f),
+                    width = w * .72f,
+                    topColor = Color(0xFFE5E7EA),
+                    bottomColor = Color(0xFFC6CAD0)
+                )
+            }
+
             WeatherKind.FOG -> {
-                drawCloud(Offset(w * .50f, h * .45f), w * .34f, Color(0xFFD7DFE9))
+                drawGoogleCloud(
+                    center = Offset(w * .50f, h * .39f),
+                    width = w * .67f,
+                    topColor = Color(0xFFE0E3E7),
+                    bottomColor = Color(0xFFC4C9D0)
+                )
                 repeat(2) { i ->
-                    drawLine(Color(0xFFB8C5D4), Offset(w * .2f, h * (.72f + i * .1f)), Offset(w * .8f, h * (.72f + i * .1f)), 3f, cap = StrokeCap.Round)
+                    drawLine(
+                        color = Color(0xFFB9BEC6),
+                        start = Offset(w * .18f, h * (.70f + i * .12f)),
+                        end = Offset(w * .82f, h * (.70f + i * .12f)),
+                        strokeWidth = w * .045f,
+                        cap = StrokeCap.Round
+                    )
                 }
             }
-            WeatherKind.RAIN, WeatherKind.STORM -> {
-                drawCloud(Offset(w * .50f, h * .45f), w * .35f, Color(0xFFD7DFE9))
-                repeat(3) { i ->
-                    val x = w * (.34f + i * .17f)
-                    drawLine(Color(0xFF5FB8FF), Offset(x, h * .67f), Offset(x - 3f, h * .82f), 4f, cap = StrokeCap.Round)
-                }
+
+            WeatherKind.RAIN -> {
+                drawGoogleCloud(
+                    center = Offset(w * .50f, h * .42f),
+                    width = w * .70f,
+                    topColor = Color(0xFFD9DCE0),
+                    bottomColor = Color(0xFFBEC3C9)
+                )
+                drawDrop(Offset(w * .57f, h * .82f), w * .12f, RainBlue)
             }
+
+            WeatherKind.STORM -> {
+                drawGoogleCloud(
+                    center = Offset(w * .50f, h * .40f),
+                    width = w * .70f,
+                    topColor = Color(0xFFD5D8DD),
+                    bottomColor = Color(0xFFB8BDC4)
+                )
+                val bolt = Path().apply {
+                    moveTo(w * .48f, h * .58f)
+                    lineTo(w * .36f, h * .75f)
+                    lineTo(w * .47f, h * .75f)
+                    lineTo(w * .39f, h * .92f)
+                    lineTo(w * .60f, h * .69f)
+                    lineTo(w * .49f, h * .69f)
+                    close()
+                }
+                drawPath(bolt, SunYellow)
+                drawDrop(Offset(w * .69f, h * .80f), w * .08f, RainBlue)
+            }
+
             WeatherKind.SNOW -> {
-                drawCloud(Offset(w * .50f, h * .43f), w * .35f, Color(0xFFE7EDF3))
-                repeat(3) { i -> drawCircle(Color.White, 3.5f, Offset(w * (.34f + i * .17f), h * .77f)) }
+                drawGoogleCloud(
+                    center = Offset(w * .50f, h * .40f),
+                    width = w * .69f,
+                    topColor = CloudTop,
+                    bottomColor = CloudMid
+                )
+                repeat(3) { i -> drawSnowflake(Offset(w * (.33f + i * .17f), h * .80f), w * .055f) }
             }
         }
     }
@@ -270,7 +367,7 @@ fun HourlyItem(hour: HourlyWeather, isNow: Boolean, modifier: Modifier = Modifie
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(if (isNow) "اکنون" else formatTime(hour.time), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            WeatherGlyph(hour.weatherCode, modifier = Modifier.size(45.dp).padding(top = 5.dp))
+            WeatherGlyph(hour.weatherCode, modifier = Modifier.size(48.dp).padding(top = 4.dp))
             Text("${hour.temperature.fa()}°", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
             Spacer(Modifier.height(3.dp))
             Text("💧 ${hour.precipitationProbability.fa()}٪", style = MaterialTheme.typography.bodySmall, color = Color(0xFF74BFFF))
@@ -293,7 +390,7 @@ fun DailyRow(day: DailyWeather, index: Int, modifier: Modifier = Modifier) {
             Text(forecastDayName(day.date, index), style = MaterialTheme.typography.titleMedium)
             Text(shortPersianDate(day.date), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
-        WeatherGlyph(day.weatherCode, modifier = Modifier.size(46.dp))
+        WeatherGlyph(day.weatherCode, modifier = Modifier.size(50.dp))
         Spacer(Modifier.width(8.dp))
         Column(Modifier.weight(.9f), horizontalAlignment = Alignment.CenterHorizontally) {
             Text(weatherDescription(day.weatherCode), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1)
@@ -326,43 +423,119 @@ fun FavoriteButton(isFavorite: Boolean, onClick: () -> Unit) {
     }
 }
 
-private fun DrawScope.drawSun(center: Offset, radius: Float) {
-    repeat(8) { i ->
-        val angle = (i * 45.0) * PI / 180.0
-        val start = Offset(center.x + cos(angle).toFloat() * radius * 1.35f, center.y + sin(angle).toFloat() * radius * 1.35f)
-        val end = Offset(center.x + cos(angle).toFloat() * radius * 1.75f, center.y + sin(angle).toFloat() * radius * 1.75f)
-        drawLine(Color(0xFFFFD867), start, end, radius * .11f, cap = StrokeCap.Round)
+private fun DrawScope.drawGoogleSun(center: Offset, radius: Float, rays: Boolean) {
+    if (rays) {
+        repeat(8) { i ->
+            val angle = (i * 45.0) * PI / 180.0
+            val start = Offset(
+                center.x + cos(angle).toFloat() * radius * 1.28f,
+                center.y + sin(angle).toFloat() * radius * 1.28f
+            )
+            val end = Offset(
+                center.x + cos(angle).toFloat() * radius * 1.55f,
+                center.y + sin(angle).toFloat() * radius * 1.55f
+            )
+            drawLine(SunYellow, start, end, radius * .11f, cap = StrokeCap.Round)
+        }
     }
     drawCircle(
-        brush = Brush.radialGradient(listOf(Color(0xFFFFF1A7), Color(0xFFFFC84D)), center = center, radius = radius * 1.4f),
+        brush = Brush.radialGradient(
+            colors = listOf(Color(0xFFFFD85B), SunOrange),
+            center = Offset(center.x - radius * .24f, center.y - radius * .24f),
+            radius = radius * 1.35f
+        ),
         radius = radius,
         center = center
     )
 }
 
 private fun DrawScope.drawMoon(center: Offset, radius: Float) {
-    drawCircle(Color(0xFFE8EEFF), radius, center)
-    drawCircle(Color(0xFF243A5D), radius * .88f, Offset(center.x - radius * .38f, center.y - radius * .22f))
+    drawCircle(Color(0xFFE7E9EC), radius, center)
+    drawCircle(Color(0xFF8F949B).copy(alpha = .35f), radius * .12f, Offset(center.x - radius * .25f, center.y - radius * .20f))
+    drawCircle(Color(0xFF8F949B).copy(alpha = .25f), radius * .08f, Offset(center.x + radius * .23f, center.y + radius * .12f))
 }
 
-private fun DrawScope.drawCloud(center: Offset, width: Float, color: Color) {
-    val height = width * .38f
+private fun DrawScope.drawGoogleCloud(
+    center: Offset,
+    width: Float,
+    topColor: Color,
+    bottomColor: Color
+) {
+    val height = width * .43f
+    val baseTop = center.y - height * .05f
+
     drawRoundRect(
-        color = color,
-        topLeft = Offset(center.x - width * .5f, center.y - height * .08f),
-        size = Size(width, height * .72f),
-        cornerRadius = androidx.compose.ui.geometry.CornerRadius(height * .35f, height * .35f)
+        brush = Brush.verticalGradient(
+            colors = listOf(topColor, bottomColor),
+            startY = center.y - height * .55f,
+            endY = center.y + height * .48f
+        ),
+        topLeft = Offset(center.x - width * .50f, baseTop),
+        size = Size(width, height * .66f),
+        cornerRadius = androidx.compose.ui.geometry.CornerRadius(height * .34f, height * .34f)
     )
-    drawCircle(color, width * .19f, Offset(center.x - width * .20f, center.y - height * .04f))
-    drawCircle(color, width * .24f, Offset(center.x + width * .08f, center.y - height * .17f))
-    drawCircle(color.copy(alpha = .96f), width * .16f, Offset(center.x + width * .28f, center.y + height * .01f))
+
+    drawCircle(
+        brush = Brush.verticalGradient(listOf(topColor, bottomColor)),
+        radius = width * .20f,
+        center = Offset(center.x - width * .20f, center.y - height * .10f)
+    )
+    drawCircle(
+        brush = Brush.verticalGradient(listOf(topColor, bottomColor)),
+        radius = width * .255f,
+        center = Offset(center.x + width * .08f, center.y - height * .23f)
+    )
+    drawCircle(
+        brush = Brush.verticalGradient(listOf(topColor, bottomColor)),
+        radius = width * .17f,
+        center = Offset(center.x + width * .30f, center.y - height * .02f)
+    )
+
     drawArc(
-        color = Color.White.copy(alpha = .10f),
-        startAngle = 190f,
-        sweepAngle = 95f,
+        color = Color.White.copy(alpha = .22f),
+        startAngle = 205f,
+        sweepAngle = 88f,
         useCenter = false,
-        topLeft = Offset(center.x - width * .38f, center.y - height * .30f),
-        size = Size(width * .62f, height * .7f),
-        style = Stroke(width = 2.5f, cap = StrokeCap.Round)
+        topLeft = Offset(center.x - width * .38f, center.y - height * .42f),
+        size = Size(width * .64f, height * .78f),
+        style = Stroke(width = (width * .024f).coerceAtLeast(1.5f), cap = StrokeCap.Round)
     )
+}
+
+private fun DrawScope.drawDrop(center: Offset, radius: Float, color: Color) {
+    val path = Path().apply {
+        moveTo(center.x, center.y - radius * 1.35f)
+        cubicTo(
+            center.x - radius * .42f, center.y - radius * .62f,
+            center.x - radius, center.y - radius * .08f,
+            center.x - radius, center.y + radius * .38f
+        )
+        cubicTo(
+            center.x - radius, center.y + radius * 1.05f,
+            center.x - radius * .48f, center.y + radius * 1.38f,
+            center.x, center.y + radius * 1.38f
+        )
+        cubicTo(
+            center.x + radius * .48f, center.y + radius * 1.38f,
+            center.x + radius, center.y + radius * 1.05f,
+            center.x + radius, center.y + radius * .38f
+        )
+        cubicTo(
+            center.x + radius, center.y - radius * .08f,
+            center.x + radius * .42f, center.y - radius * .62f,
+            center.x, center.y - radius * 1.35f
+        )
+        close()
+    }
+    drawPath(path, color)
+    drawCircle(Color.White.copy(alpha = .24f), radius * .17f, Offset(center.x - radius * .31f, center.y - radius * .14f))
+}
+
+private fun DrawScope.drawSnowflake(center: Offset, radius: Float) {
+    repeat(3) { i ->
+        val angle = (i * 60.0) * PI / 180.0
+        val dx = cos(angle).toFloat() * radius
+        val dy = sin(angle).toFloat() * radius
+        drawLine(Color.White, Offset(center.x - dx, center.y - dy), Offset(center.x + dx, center.y + dy), radius * .22f, cap = StrokeCap.Round)
+    }
 }
