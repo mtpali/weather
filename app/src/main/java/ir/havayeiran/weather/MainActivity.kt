@@ -18,7 +18,7 @@ import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ir.havayeiran.weather.data.PreferencesStore
 import ir.havayeiran.weather.data.WeatherRepository
-import ir.havayeiran.weather.ui.GoogleWeatherScreenV5
+import ir.havayeiran.weather.ui.GoogleWeatherScreenV6
 import ir.havayeiran.weather.ui.HavayeIranTheme
 import ir.havayeiran.weather.ui.WeatherViewModel
 import ir.havayeiran.weather.ui.WeatherViewModelFactory
@@ -46,7 +46,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             val state by viewModel.uiState.collectAsStateWithLifecycle()
             HavayeIranTheme(darkTheme = state.darkMode) {
-                GoogleWeatherScreenV5(
+                GoogleWeatherScreenV6(
                     state = state,
                     onSearchChange = viewModel::updateSearchQuery,
                     onClearSearch = viewModel::clearSearch,
